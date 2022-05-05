@@ -1,14 +1,17 @@
-Java DynamoDB Local Test Demo
-=====================
+Java DynamoDB Local with Sqlite4java Demo
+=========================================
 
-1. 需要在本地启动一个dynamodb，为了简单起见，使用docker: testcontainers + dynalite
-2. dynalite向host暴露的port是随机的（特意设计的），所以我们在构建url时，需要手动拿到该port
-3. junit4与junit5的集成方法区别很大，需要使用`org.testcontainers:junit-jupiter`，以及`@Testcontainers/@Container`，其内容只占了网站中的一页: https://www.testcontainers.org/test_framework_integration/junit_5/
-4. 网上有很多相关的内容，但都存在各种问题，不好用（见pom.xml中被注释掉的库）
-5. 测试运行很慢，启动docker及建表需要20多秒，所以做不到每个测试前新开一个干净环境，只能一次性建好表，然后每个测试注意环境中其它数据对自己的影响
+试过 https://cashapp.github.io/tempest/guide/testing/，但是还是需要自己处理 sqlite4java native，并没有简单多少。
 
-总体来说不太理想，如果有一个内存中的mock就好了，估计不太好弄。
+最后还是采用 https://stackoverflow.com/a/37780083/342235 这里的办法，也没有麻烦多少。
 
-好像还有一种直接调用jar+sql4j的方式，到时候试试，希望能快一点。
+需要注意的是：DynamoDBLocal中引用的aws-java-sdk-core版本是旧的，与指定的aws-java-sdk-dynamodb版本不同时， 会报一种Field错误，需要手动处理版本。
+可以使用`aws-java-sdk-bom`来避免版本问题，但需要在`DynamoDBLocal`中`exclusion`掉不匹配的库
 
-Run `HelloDynamoDbTest.java` in your IDE.
+这种办法与docker相比，速度快了很多。
+
+Run:
+
+```
+mvn test
+```
